@@ -37,7 +37,7 @@ const (
 )
 
 // Config parameters manipulated by tests or possibly external options
-type config struct {
+type Config struct {
 	Version string
 
 	PrintDialContext bool // "d" - diagnostics settings are lowercase
@@ -62,6 +62,9 @@ type config struct {
 	NotFoundSRVTTL time.Duration // How long a not-found SRV is retained in the cache
 	FoundSRVTTL    time.Duration // How long a found SRV is retained in the cache
 	HealthTTL      time.Duration // How long a target stays in the cache
+
+	StaticEndpoints []*net.SRV
+	SkipSRVLookup   bool
 }
 
 // cslbStats holds all statistics for the cslb package. See addStats() for typical usage.
@@ -113,7 +116,7 @@ func (t *cslb) addStats(ls *cslbStats) {
 // reason it's a struct rather than a big lump of globals is to make it easy to test. Normally there
 // will only be one of these structs created per program.
 type cslb struct {
-	config
+	Config
 
 	netResolver       limitedResolver // Replaceable functions for test mocks
 	netDialer         *net.Dialer     // Not used - only here in case we later decide to modify Dialer values
@@ -148,7 +151,7 @@ func newCslb() *cslb {
 	t.healthStore = newHealthCache()
 	t.hcClient = &http.Client{Transport: &http.Transport{}} // Use a non-cslb http.Transport
 
-	// Transfer in all the default config values and then over-ride them
+	// Transfer in all the default Config values and then over-ride them
 
 	t.Version = Version
 
@@ -210,7 +213,7 @@ func newCslb() *cslb {
 }
 
 // start starts up the cache cleaners and optionally the status web server. It is called *after* all
-// config settings have been over-ridden so as to avoid any race conditions - particularly with
+// Config settings have been over-ridden so as to avoid any race conditions - particularly with
 // tests.
 func (t *cslb) start() *cslb {
 	t.srvStore.start((t.FoundSRVTTL / 5) + time.Second)

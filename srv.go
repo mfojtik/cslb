@@ -98,10 +98,23 @@ func (t *cslb) lookupSRV(ctx context.Context, now time.Time, service, proto, dom
 	}
 	t.srvStore.RUnlock() // Don't hold mutex across a possible DNS lookup
 
+	var srvList []*net.SRV
 	cesrv = &ceSRV{expires: now.Add(t.NotFoundSRVTTL), lookups: 1} // Assume NXDomain
-	_, srvList, _ := t.netResolver.LookupSRV(ctx, "", "", key)
+
+	// Skip SRV lookup if we don't care about SRV records.
+	// This usually means user want to define static list of endpoints.
+	if t.SkipSRVLookup {
+		_, srvList, _ = t.netResolver.LookupSRV(ctx, "", "", key)
+		// TODO: this will set expiration for static entries as well, there should be better way to deal with this
+		if len(srvList) > 0 {
+			cesrv.expires = now.Add(t.FoundSRVTTL)
+		}
+	}
+
+	// Append user defined static endpoints
+	srvList = append(srvList, t.StaticEndpoints...)
+
 	if len(srvList) > 0 { // Found something so transfer to the new ceSRV
-		cesrv.expires = now.Add(t.FoundSRVTTL)
 		cesrv.populate(srvList)
 	}
 

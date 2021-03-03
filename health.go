@@ -12,7 +12,7 @@ successful TCP setup. Furthermore a health check URL can be used to administrati
 on and off. Or take it "out of rotation" in devop parlance.
 
 Most of these functions are actually cslb functions rather than healthCache functions because they
-need access to cslb variables such as config and resolver. This could be restructured to bring all
+need access to cslb variables such as Config and resolver. This could be restructured to bring all
 those values within a healthStore, but there's not a lot of value in that apart from slightly better
 encapsulation.
 */

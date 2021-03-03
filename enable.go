@@ -15,3 +15,10 @@ func Enable(ht *http.Transport) *http.Transport {
 
 	return ht
 }
+
+func EnableWithConfig(config Config, ht *http.Transport) *http.Transport {
+	c := getCSLB()
+	c.Config = config
+	ht.DialContext = c.dialContext
+	return ht
+}

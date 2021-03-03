@@ -11,7 +11,7 @@ import (
 
 func TestStatusTemplates(t *testing.T) {
 	ss := newStatusServer(newCslb())
-	for _, tn := range []string{"config", "cslb", "srv", "health"} { // Check that all templates have parsed ok
+	for _, tn := range []string{"Config", "cslb", "srv", "health"} { // Check that all templates have parsed ok
 		tmpl := ss.allTmpl.Lookup(tn)
 		if tmpl == nil {
 			t.Error("Template", tn, "missing from parsed template allTmpl")

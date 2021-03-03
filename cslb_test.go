@@ -38,7 +38,7 @@ func TestCSLBGoodOptions(t *testing.T) {
 	if !cslb.PrintHCResults || !cslb.PrintIntercepts || !cslb.PrintSRVLookup || !cslb.PrintDialContext ||
 		!cslb.PrintDialResults || !cslb.DisableHealthChecks || !cslb.DisableInterception ||
 		!cslb.AllowNumericServices {
-		t.Error("At least one option not set", cslb.config)
+		t.Error("At least one option not set", cslb.Config)
 	}
 
 	if cslb.HealthCheckContentOk != "BIG OK" {
@@ -79,7 +79,7 @@ func TestCSLBBadOptions(t *testing.T) {
 	cslb := newCslb()
 	if cslb.PrintHCResults || cslb.PrintIntercepts || cslb.PrintSRVLookup || cslb.PrintDialContext ||
 		cslb.DisableHealthChecks || cslb.DisableInterception {
-		t.Error("At least one option unexpectedly set", cslb.config)
+		t.Error("At least one option unexpectedly set", cslb.Config)
 	}
 
 	if cslb.DialVetoDuration != defaultDialVetoDuration {

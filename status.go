@@ -25,7 +25,7 @@ const (
 <head><title>CSLB - Client Side Load Balancing - Status</title></head>
 <body>
 `
-	configStr = `{{define "config"}}
+	configStr = `{{define "Config"}}
 <h3>CSLB Global State</h3>
 <table border=1>
 <tr><th align=left>Start Time</th><td align=right>{{.StartTime.Format "2006-01-02T15:04:05Z07:00"}}</td></tr>
@@ -197,7 +197,7 @@ type cslbAggConfig struct {
 	Duration    time.Duration
 	DialContext int
 	Executable  string
-	config
+	Config
 }
 
 type cslbAggTrailer struct {
@@ -212,7 +212,7 @@ func (t *statusServer) generateStatus(w http.ResponseWriter, req *http.Request) 
 	io.WriteString(w, header)
 
 	var cac cslbAggConfig
-	cac.config = t.cslb.config
+	cac.Config = t.cslb.Config
 	cas := t.cslb.cloneStats() // Take a copy to avoid holding a long mutex
 
 	cac.StartTime = cas.StartTime
@@ -221,7 +221,7 @@ func (t *statusServer) generateStatus(w http.ResponseWriter, req *http.Request) 
 	cac.DialContext = cas.DialContext
 	cac.Executable, _ = os.Executable()
 
-	err = t.allTmpl.ExecuteTemplate(w, "config", &cac)
+	err = t.allTmpl.ExecuteTemplate(w, "Config", &cac)
 	if err != nil {
 		log.Fatal(err)
 	}
